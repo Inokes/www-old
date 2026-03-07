@@ -1,8 +1,9 @@
 {
-	"devDependencies": {
-		"prettier": "^3.8.1"
-	},
-	"scripts": {
-		"format": "prettier --write ."
-	}
+  "devDependencies": {
+    "prettier": "^3.8.1",
+    "@prettier/plugin-xml": "^3.2.2"
+  },
+  "scripts": {
+    "format": "prettier --write \"**/*.{html,js,css,json,md,xml}\""
+  }
 }
