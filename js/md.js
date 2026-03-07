@@ -1,16 +1,11 @@
-export class MarkdownParser{
+export class MarkdownParser {
+	static async load(path) {
+		const res = await fetch(path);
 
-static async load(path){
+		if (!res.ok) throw new Error('failed to load markdown');
 
-const res = await fetch(path)
+		const text = await res.text();
 
-if(!res.ok)
-throw new Error("failed to load markdown")
-
-const text = await res.text()
-
-return marked.parse(text)
-
-}
-
+		return marked.parse(text);
+	}
 }

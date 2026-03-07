@@ -1,63 +1,47 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>pxwo blog</title>
 
-<title>pxwo blog</title>
+		<link rel="stylesheet" href="etc/main.css" />
 
-<link rel="stylesheet" href="etc/main.css">
+		<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+	</head>
 
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+	<body>
+		<div class="mobile-block">desktop only</div>
 
-</head>
+		<div id="bg"></div>
 
-<body>
+		<div id="app">
+			<header id="topbar">
+				<div class="profile">
+					<img src="etc/profile.png" />
+					<span>pxwo</span>
+				</div>
 
-<div class="mobile-block">
-desktop only
-</div>
+				<button id="menu-btn" class="btn">pages</button>
+			</header>
 
-<div id="bg"></div>
+			<div id="menu">
+				<div class="menu-top">
+					<input id="search" placeholder="search" />
 
-<div id="app">
+					<div class="view-buttons">
+						<button id="list-view" class="btn">list</button>
+						<button id="grid-view" class="btn">grid</button>
+					</div>
+				</div>
 
-<header id="topbar">
+				<div id="page-list" class="list"></div>
+			</div>
 
-<div class="profile">
-<img src="etc/profile.png">
-<span>pxwo</span>
-</div>
+			<main id="content"></main>
+		</div>
 
-<button id="menu-btn" class="btn">
-pages
-</button>
-
-</header>
-
-<div id="menu">
-
-<div class="menu-top">
-
-<input id="search" placeholder="search">
-
-<div class="view-buttons">
-<button id="list-view" class="btn">list</button>
-<button id="grid-view" class="btn">grid</button>
-</div>
-
-</div>
-
-<div id="page-list" class="list"></div>
-
-</div>
-
-<main id="content"></main>
-
-</div>
-
-<script type="module" src="js/app.js"></script>
-
-</body>
+		<script type="module" src="js/app.js"></script>
+	</body>
 </html>

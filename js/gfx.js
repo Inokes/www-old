@@ -1,47 +1,41 @@
-export class GFX{
+export class GFX {
+	constructor() {
+		this.container = document.getElementById('bg');
 
-constructor(){
+		this.canvas = document.createElement('canvas');
+		this.container.appendChild(this.canvas);
 
-this.container=document.getElementById("bg")
+		this.gl = this.canvas.getContext('webgl', { antialias: false });
 
-this.canvas=document.createElement("canvas")
-this.container.appendChild(this.canvas)
+		this.scale = 3;
 
-this.gl=this.canvas.getContext("webgl",{antialias:false})
+		this.resize();
+		window.addEventListener('resize', () => this.resize());
 
-this.scale=3
+		this.init();
+	}
 
-this.resize()
-window.addEventListener("resize",()=>this.resize())
+	resize() {
+		this.width = Math.floor(window.innerWidth / this.scale);
+		this.height = Math.floor(window.innerHeight / this.scale);
 
-this.init()
+		this.canvas.width = window.innerWidth;
+		this.canvas.height = window.innerHeight;
+	}
 
-}
+	init() {
+		const gl = this.gl;
 
-resize(){
-
-this.width=Math.floor(window.innerWidth/this.scale)
-this.height=Math.floor(window.innerHeight/this.scale)
-
-this.canvas.width=window.innerWidth
-this.canvas.height=window.innerHeight
-
-}
-
-init(){
-
-const gl=this.gl
-
-const vs=`
+		const vs = `
 attribute vec2 p;
 varying vec2 uv;
 void main(){
 uv=(p+1.0)*0.5;
 gl_Position=vec4(p,0.0,1.0);
 }
-`
+`;
 
-const fsStep=`
+		const fsStep = `
 precision mediump float;
 
 uniform sampler2D tex;
@@ -81,9 +75,9 @@ if(n==3.0) next=1.0;
 
 gl_FragColor=vec4(next,next,next,1.0);
 }
-`
+`;
 
-const fsDraw=`
+		const fsDraw = `
 precision mediump float;
 
 uniform sampler2D tex;
@@ -102,213 +96,180 @@ v
 gl_FragColor=vec4(col,1.0);
 
 }
-`
+`;
 
-this.stepProg=this.program(vs,fsStep)
-this.drawProg=this.program(vs,fsDraw)
+		this.stepProg = this.program(vs, fsStep);
+		this.drawProg = this.program(vs, fsDraw);
 
-this.quad()
+		this.quad();
 
-this.texA=this.texture()
-this.texB=this.texture()
+		this.texA = this.texture();
+		this.texB = this.texture();
 
-this.fbA=this.framebuffer(this.texA)
-this.fbB=this.framebuffer(this.texB)
+		this.fbA = this.framebuffer(this.texA);
+		this.fbB = this.framebuffer(this.texB);
 
-this.seed()
+		this.seed();
 
-this.loop()
+		this.loop();
+	}
 
-}
+	program(vsSrc, fsSrc) {
+		const gl = this.gl;
 
-program(vsSrc,fsSrc){
+		const vs = this.shader(gl.VERTEX_SHADER, vsSrc);
+		const fs = this.shader(gl.FRAGMENT_SHADER, fsSrc);
 
-const gl=this.gl
+		const p = gl.createProgram();
 
-const vs=this.shader(gl.VERTEX_SHADER,vsSrc)
-const fs=this.shader(gl.FRAGMENT_SHADER,fsSrc)
+		gl.attachShader(p, vs);
+		gl.attachShader(p, fs);
 
-const p=gl.createProgram()
+		gl.bindAttribLocation(p, 0, 'p');
 
-gl.attachShader(p,vs)
-gl.attachShader(p,fs)
+		gl.linkProgram(p);
 
-gl.bindAttribLocation(p,0,"p")
+		return p;
+	}
 
-gl.linkProgram(p)
+	shader(type, src) {
+		const gl = this.gl;
 
-return p
+		const s = gl.createShader(type);
 
-}
+		gl.shaderSource(s, src);
+		gl.compileShader(s);
 
-shader(type,src){
+		return s;
+	}
 
-const gl=this.gl
+	quad() {
+		const gl = this.gl;
 
-const s=gl.createShader(type)
+		const buf = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, buf);
 
-gl.shaderSource(s,src)
-gl.compileShader(s)
+		gl.bufferData(
+			gl.ARRAY_BUFFER,
+			new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]),
+			gl.STATIC_DRAW
+		);
 
-return s
+		gl.enableVertexAttribArray(0);
+		gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+	}
 
-}
+	texture() {
+		const gl = this.gl;
 
-quad(){
+		const tex = gl.createTexture();
 
-const gl=this.gl
+		gl.bindTexture(gl.TEXTURE_2D, tex);
 
-const buf=gl.createBuffer()
-gl.bindBuffer(gl.ARRAY_BUFFER,buf)
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 
-gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([
--1,-1,
-1,-1,
--1,1,
-1,1
-]),gl.STATIC_DRAW)
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 
-gl.enableVertexAttribArray(0)
-gl.vertexAttribPointer(0,2,gl.FLOAT,false,0,0)
+		gl.texImage2D(
+			gl.TEXTURE_2D,
+			0,
+			gl.RGBA,
+			this.width,
+			this.height,
+			0,
+			gl.RGBA,
+			gl.UNSIGNED_BYTE,
+			null
+		);
 
-}
+		return tex;
+	}
 
-texture(){
+	framebuffer(tex) {
+		const gl = this.gl;
 
-const gl=this.gl
+		const fb = gl.createFramebuffer();
 
-const tex=gl.createTexture()
+		gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
 
-gl.bindTexture(gl.TEXTURE_2D,tex)
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tex, 0);
 
-gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.NEAREST)
-gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.NEAREST)
+		return fb;
+	}
 
-gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE)
-gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE)
+	seed() {
+		const gl = this.gl;
 
-gl.texImage2D(
-gl.TEXTURE_2D,
-0,
-gl.RGBA,
-this.width,
-this.height,
-0,
-gl.RGBA,
-gl.UNSIGNED_BYTE,
-null
-)
+		const data = new Uint8Array(this.width * this.height * 4);
 
-return tex
+		for (let i = 0; i < data.length; i += 4) {
+			const v = Math.random() > 0.88 ? 255 : 0;
 
-}
+			data[i] = v;
+			data[i + 1] = v;
+			data[i + 2] = v;
+			data[i + 3] = 255;
+		}
 
-framebuffer(tex){
+		gl.bindTexture(gl.TEXTURE_2D, this.texA);
 
-const gl=this.gl
+		gl.texImage2D(
+			gl.TEXTURE_2D,
+			0,
+			gl.RGBA,
+			this.width,
+			this.height,
+			0,
+			gl.RGBA,
+			gl.UNSIGNED_BYTE,
+			data
+		);
+	}
 
-const fb=gl.createFramebuffer()
+	step(src, fb) {
+		const gl = this.gl;
 
-gl.bindFramebuffer(gl.FRAMEBUFFER,fb)
+		gl.useProgram(this.stepProg);
 
-gl.framebufferTexture2D(
-gl.FRAMEBUFFER,
-gl.COLOR_ATTACHMENT0,
-gl.TEXTURE_2D,
-tex,
-0
-)
+		gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
 
-return fb
+		gl.viewport(0, 0, this.width, this.height);
 
-}
+		gl.bindTexture(gl.TEXTURE_2D, src);
 
-seed(){
+		gl.uniform2f(gl.getUniformLocation(this.stepProg, 'res'), this.width, this.height);
 
-const gl=this.gl
+		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+	}
 
-const data=new Uint8Array(this.width*this.height*4)
+	draw(tex) {
+		const gl = this.gl;
 
-for(let i=0;i<data.length;i+=4){
+		gl.useProgram(this.drawProg);
 
-const v=Math.random()>0.88?255:0
+		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
-data[i]=v
-data[i+1]=v
-data[i+2]=v
-data[i+3]=255
+		gl.viewport(0, 0, this.canvas.width, this.canvas.height);
 
-}
+		gl.bindTexture(gl.TEXTURE_2D, tex);
 
-gl.bindTexture(gl.TEXTURE_2D,this.texA)
+		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+	}
 
-gl.texImage2D(
-gl.TEXTURE_2D,
-0,
-gl.RGBA,
-this.width,
-this.height,
-0,
-gl.RGBA,
-gl.UNSIGNED_BYTE,
-data
-)
+	loop() {
+		this.step(this.texA, this.fbB);
+		this.draw(this.texB);
 
-}
+		let t = this.texA;
+		this.texA = this.texB;
+		this.texB = t;
 
-step(src,fb){
+		let f = this.fbA;
+		this.fbA = this.fbB;
+		this.fbB = f;
 
-const gl=this.gl
-
-gl.useProgram(this.stepProg)
-
-gl.bindFramebuffer(gl.FRAMEBUFFER,fb)
-
-gl.viewport(0,0,this.width,this.height)
-
-gl.bindTexture(gl.TEXTURE_2D,src)
-
-gl.uniform2f(
-gl.getUniformLocation(this.stepProg,"res"),
-this.width,
-this.height
-)
-
-gl.drawArrays(gl.TRIANGLE_STRIP,0,4)
-
-}
-
-draw(tex){
-
-const gl=this.gl
-
-gl.useProgram(this.drawProg)
-
-gl.bindFramebuffer(gl.FRAMEBUFFER,null)
-
-gl.viewport(0,0,this.canvas.width,this.canvas.height)
-
-gl.bindTexture(gl.TEXTURE_2D,tex)
-
-gl.drawArrays(gl.TRIANGLE_STRIP,0,4)
-
-}
-
-loop(){
-
-this.step(this.texA,this.fbB)
-this.draw(this.texB)
-
-let t=this.texA
-this.texA=this.texB
-this.texB=t
-
-let f=this.fbA
-this.fbA=this.fbB
-this.fbB=f
-
-requestAnimationFrame(()=>this.loop())
-
-}
-
+		requestAnimationFrame(() => this.loop());
+	}
 }

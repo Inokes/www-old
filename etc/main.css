@@ -1,207 +1,181 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400&display=swap');
 
-:root{
+:root {
+	--bg: #1e2326;
+	--bg-soft: #272e33;
 
---bg:#1e2326;
---bg-soft:#272e33;
+	--fg: #d3c6aa;
 
---fg:#d3c6aa;
+	--green: #a7c080;
+	--blue: #7fbbb3;
 
---green:#a7c080;
---blue:#7fbbb3;
-
---border:#374145;
-
+	--border: #374145;
 }
 
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
 }
 
-body{
-
-background:var(--bg);
-color:var(--fg);
-font-family:'Poppins',sans-serif;
-
+body {
+	background: var(--bg);
+	color: var(--fg);
+	font-family: 'Poppins', sans-serif;
 }
 
 /* webgl background */
 
-#bg{
-position:fixed;
-inset:0;
-z-index:-1;
+#bg {
+	position: fixed;
+	inset: 0;
+	z-index: -1;
 }
 
 /* mobile block */
 
-.mobile-block{
-display:none;
-position:fixed;
-inset:0;
-background:#000;
-color:#fff;
-align-items:center;
-justify-content:center;
-z-index:9999;
+.mobile-block {
+	display: none;
+	position: fixed;
+	inset: 0;
+	background: #000;
+	color: #fff;
+	align-items: center;
+	justify-content: center;
+	z-index: 9999;
 }
 
-@media (max-width:800px){
-
-.mobile-block{display:flex}
-#app{display:none}
-
+@media (max-width: 800px) {
+	.mobile-block {
+		display: flex;
+	}
+	#app {
+		display: none;
+	}
 }
 
 /* topbar */
 
-#topbar{
+#topbar {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
 
-display:flex;
-justify-content:space-between;
-align-items:center;
+	padding: 10px 20px;
 
-padding:10px 20px;
-
-background:var(--bg-soft);
-border-bottom:1px solid var(--border);
-
+	background: var(--bg-soft);
+	border-bottom: 1px solid var(--border);
 }
 
-.profile{
-display:flex;
-align-items:center;
-gap:10px;
+.profile {
+	display: flex;
+	align-items: center;
+	gap: 10px;
 }
 
-.profile img{
-
-width:36px;
-height:36px;
-border-radius:50%;
-
+.profile img {
+	width: 36px;
+	height: 36px;
+	border-radius: 50%;
 }
 
 /* buttons */
 
-.btn{
+.btn {
+	background: transparent;
+	border: 1px solid var(--border);
+	color: var(--fg);
 
-background:transparent;
-border:1px solid var(--border);
-color:var(--fg);
-
-padding:6px 12px;
-cursor:pointer;
-
+	padding: 6px 12px;
+	cursor: pointer;
 }
 
-.btn:hover{
-
-border-color:var(--green);
-color:var(--green);
-
+.btn:hover {
+	border-color: var(--green);
+	color: var(--green);
 }
 
 /* menu */
 
-#menu{
+#menu {
+	position: fixed;
+	top: 70px;
+	left: 50%;
+	transform: translateX(-50%);
 
-position:fixed;
-top:70px;
-left:50%;
-transform:translateX(-50%);
+	width: 650px;
+	max-width: 90%;
 
-width:650px;
-max-width:90%;
+	background: var(--bg-soft);
+	border: 1px solid var(--border);
 
-background:var(--bg-soft);
-border:1px solid var(--border);
+	padding: 12px;
 
-padding:12px;
-
-display:none;
-
+	display: none;
 }
 
-#menu.visible{
-display:block;
+#menu.visible {
+	display: block;
 }
 
-.menu-top{
-
-display:flex;
-gap:10px;
-margin-bottom:10px;
-
+.menu-top {
+	display: flex;
+	gap: 10px;
+	margin-bottom: 10px;
 }
 
-#search{
+#search {
+	flex: 1;
 
-flex:1;
+	background: var(--bg);
+	border: 1px solid var(--border);
 
-background:var(--bg);
-border:1px solid var(--border);
+	color: var(--fg);
 
-color:var(--fg);
-
-padding:6px;
-
+	padding: 6px;
 }
 
-.view-buttons{
-display:flex;
-gap:6px;
+.view-buttons {
+	display: flex;
+	gap: 6px;
 }
 
 /* page list */
 
-#page-list.list{
-
-display:flex;
-flex-direction:column;
-gap:6px;
-
+#page-list.list {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
 }
 
-#page-list.grid{
-
-display:grid;
-grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
-gap:8px;
-
+#page-list.grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+	gap: 8px;
 }
 
-.page{
-
-border:1px solid var(--border);
-padding:8px;
-cursor:pointer;
-
+.page {
+	border: 1px solid var(--border);
+	padding: 8px;
+	cursor: pointer;
 }
 
-.page:hover{
-
-border-color:var(--green);
-color:var(--green);
-
+.page:hover {
+	border-color: var(--green);
+	color: var(--green);
 }
 
 /* content */
 
-#content{
+#content {
+	max-width: 900px;
+	margin: auto;
+	padding: 40px 20px;
 
-max-width:900px;
-margin:auto;
-padding:40px 20px;
-
-opacity:0;
-transition:opacity .25s ease;
-
+	opacity: 0;
+	transition: opacity 0.25s ease;
 }
 
-#content.show{
-opacity:1;
+#content.show {
+	opacity: 1;
 }
