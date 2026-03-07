@@ -1,0 +1,42 @@
+name: generate index.json
+
+on:
+  push:
+    paths:
+      - "md/**"
+      - "etc/genfs.py"
+  workflow_dispatch:
+
+jobs:
+  genfs:
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+
+      - name: checkout
+        uses: actions/checkout@v4
+
+      - name: setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: run genfs
+        run: |
+          python etc/genfs.py
+
+      - name: commit index
+        run: |
+          if git diff --quiet; then
+            echo "no changes"
+          else
+            git config user.name "github actions"
+            git config user.email "actions@github.com"
+            git add etc/index.json
+            git commit -m "update index.json"
+            git push
+          fi
